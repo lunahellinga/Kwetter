@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  labels:
+    app.kubernetes.io/part-of: kwetter
+  name: kwetter-data-service
+  namespace: default
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://davidhellinga.github.io/charts/
+    chart: kwetter-data-service
+    targetRevision: '*'
+    # Start environment
+    helm:
+      parameters:
+        - name: yugabyte.host
+          value:
+            TODO
+        - name: yugabyte.user
+          value:
+            TODO
+        - name: yugabyte.password
+          value:
+            TODO
+    # End environment
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+
+  revisionHistoryLimit: 3
+  syncPolicy:
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+      - FailOnSharedResource=true
+      - PruneLast=true
+    automated:
+      prune: true
+      selfHeal: true

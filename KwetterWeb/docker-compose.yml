@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  kwetter:
+    image: fontyssa/kwetter
+    build:
+      context: .
+      dockerfile: kwetter/Dockerfile
+    ports:
+      - "443:443"
+      - "80:80"

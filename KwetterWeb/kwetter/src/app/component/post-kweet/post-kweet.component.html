@@ -1,0 +1,7 @@
+<div class="post-kweet-container">
+  <mat-form-field appearance="fill">
+    <mat-label>Enter your kweet</mat-label>
+    <textarea matInput type="text" [(ngModel)]="kweetText" placeholder="Enter your kweet"></textarea>
+  </mat-form-field>
+  <button mat-raised-button color="primary" (click)="postKweet()">Post</button>
+</div>

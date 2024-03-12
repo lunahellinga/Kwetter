@@ -1,0 +1,11 @@
+﻿{
+  "profiles": {
+    "ContentService": {
+      "commandName": "Project",
+      "dotnetRunMessages": "true",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

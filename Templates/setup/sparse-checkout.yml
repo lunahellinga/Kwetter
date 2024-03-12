@@ -1,0 +1,12 @@
+steps:
+  - checkout: none
+  - task: CmdLine@2
+    displayName: Get content of repo path
+    inputs:
+      script: |
+        git init
+        git sparse-checkout init --cone
+        git sparse-checkout set $(repoPath) Domain
+        git remote add origin https://OIBSS-F@dev.azure.com/OIBSS-F/Kwetter/_git/Kweeter
+        git fetch --progress --verbose --depth=0 origin
+        git switch $(Build.SourceBranchName)

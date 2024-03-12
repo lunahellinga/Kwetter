@@ -1,0 +1,10 @@
+steps:
+  - task: UseDotNet@2
+    inputs:
+      version: "7.x"
+      includePreviewVersions: true
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet restore'
+    inputs:
+      command: restore
+      projects: '**/*.csproj'

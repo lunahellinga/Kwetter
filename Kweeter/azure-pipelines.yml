@@ -1,0 +1,189 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  # Configure SonarCloud
+  cliProjectKey: 'oibss-f_Kweeter'
+  cliProjectName: 'Kweeter'
+  # Configure build
+  solution: "Kweeter.sln"
+  buildConfiguration: "Release"
+  # Docker build and push
+  dockerServiceConnection: "DockerHub SA"
+  dockerComposePath: "docker-compose-builder.yml"
+
+stages:
+  - stage: Build
+    displayName: "Build Stage"
+    jobs:
+      - job: BuildJob
+        displayName: "Build Job"
+        steps:
+          - task: UseDotNet@2
+            inputs:
+              version: "7.x"
+              includePreviewVersions: true
+          - task: DotNetCoreCLI@2
+            displayName: 'dotnet restore'
+            inputs:
+              command: restore
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: "build"
+              projects: "$(solution)"
+              arguments: "--configuration $(buildConfiguration)"
+
+  - stage: Scans
+    displayName: SonarCloud Analysis
+    dependsOn: Build
+    jobs:
+      - job: SonarCloud
+        displayName: SonarCloud Code Quality Scan
+        steps:
+          - checkout: self
+            fetchDepth: 0
+          - task: SonarCloudPrepare@1
+            inputs:
+              SonarCloud: 'SonarCloud'
+              organization: 'oibss-fontys'
+              scannerMode: 'MSBuild'
+              projectKey: "$(cliProjectKey)"
+              projectName: "$(cliProjectKey)"
+          - task: UseDotNet@2
+            inputs:
+              version: "7.x"
+              includePreviewVersions: true
+          - task: DotNetCoreCLI@2
+            displayName: 'dotnet restore'
+            inputs:
+              command: restore
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: "build"
+              projects: "$(solution)"
+              arguments: "--configuration $(buildConfiguration)"
+          - task: SonarCloudAnalyze@1
+          - task: SonarCloudPublish@1
+            inputs:
+              pollingTimeoutSec: '300'
+      - job: Snyk
+        displayName: Snyk Security Scan
+        steps:
+          - task: SnykSecurityScan@1
+            displayName: Kwetter API
+            inputs:
+              serviceConnectionEndpoint: 'Snyk'
+              testType: 'container'
+              dockerImageName: 'fontyssa/kwetter-api'
+              dockerfilePath: 'KwetterAPI/Dockerfile'
+              monitorWhen: 'always'
+              failOnIssues: false
+              projectName: 'Kweeter'
+              organization: 'd.hellinga'
+          - task: SnykSecurityScan@1
+            displayName: Data Service
+            inputs:
+              serviceConnectionEndpoint: 'Snyk'
+              testType: 'container'
+              dockerImageName: 'fontyssa/kwetter-data-service'
+              dockerfilePath: 'DataService/Dockerfile'
+              monitorWhen: 'always'
+              failOnIssues: false
+              projectName: 'Kweeter'
+              organization: 'd.hellinga'
+          - task: SnykSecurityScan@1
+            displayName: Content Service
+            inputs:
+              serviceConnectionEndpoint: 'Snyk'
+              testType: 'container'
+              dockerImageName: 'fontyssa/kwetter-content-service'
+              dockerfilePath: 'ContentService/Dockerfile'
+              monitorWhen: 'always'
+              failOnIssues: false
+              projectName: 'Kweeter'
+              organization: 'd.hellinga'
+          - task: SnykSecurityScan@1
+            displayName: Mention Service
+            inputs:
+              serviceConnectionEndpoint: 'Snyk'
+              testType: 'container'
+              dockerImageName: 'fontyssa/kwetter-mention-service'
+              dockerfilePath: 'MentionService/Dockerfile'
+              monitorWhen: 'always'
+              failOnIssues: false
+              projectName: 'Kweeter'
+              organization: 'd.hellinga'
+          - task: SnykSecurityScan@1
+            displayName: Tag Service
+            inputs:
+              serviceConnectionEndpoint: 'Snyk'
+              testType: 'container'
+              dockerImageName: 'fontyssa/kwetter-tag-service'
+              dockerfilePath: 'TagService/Dockerfile'
+              monitorWhen: 'always'
+              failOnIssues: false
+              projectName: 'Kweeter'
+              organization: 'd.hellinga'
+          - task: SnykSecurityScan@1
+            displayName: Metadata Service
+            inputs:
+              serviceConnectionEndpoint: 'Snyk'
+              testType: 'container'
+              dockerImageName: 'fontyssa/kwetter-metadata-service'
+              dockerfilePath: 'MetadataService/Dockerfile'
+              monitorWhen: 'always'
+              failOnIssues: false
+              projectName: 'Kweeter'
+              organization: 'd.hellinga'
+          - task: SnykSecurityScan@1
+            displayName: Cache Service
+            inputs:
+              serviceConnectionEndpoint: 'Snyk'
+              testType: 'container'
+              dockerImageName: 'fontyssa/kwetter-cache-service'
+              dockerfilePath: 'CacheService/Dockerfile'
+              monitorWhen: 'always'
+              failOnIssues: false
+              projectName: 'Kweeter'
+              organization: 'd.hellinga'
+          - task: SnykSecurityScan@1
+            displayName: Kweeter
+            inputs:
+              serviceConnectionEndpoint: 'Snyk'
+              testType: 'container'
+              dockerImageName: 'fontyssa/kweeter'
+              dockerfilePath: 'Kweeter/Dockerfile'
+              monitorWhen: 'always'
+              failOnIssues: false
+              projectName: 'Kweeter'
+              organization: 'd.hellinga'
+
+  - stage: Delivery
+    displayName: DockerHub Delivery
+    dependsOn: Scans
+    jobs:
+      - job: DockerHub
+        displayName: DockerHub Delivery
+        steps:
+          - task: DockerCompose@0
+            inputs:
+              containerregistrytype: 'Container Registry'
+              dockerRegistryEndpoint: "$(dockerServiceConnection)"
+              dockerComposeFile: "$(dockerComposePath)"
+              action: 'Build services'
+          - task: DockerCompose@0
+            inputs:
+              containerregistrytype: 'Container Registry'
+              dockerRegistryEndpoint: "$(dockerServiceConnection)"
+              dockerComposeFile: "$(dockerComposePath)"
+              action: 'Push services'
+              includeSourceTags: true
+              includeLatestTag: true

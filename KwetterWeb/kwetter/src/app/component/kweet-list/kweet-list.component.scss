@@ -1,0 +1,44 @@
+$twitter-blue: #1da1f2;
+$kweet-background: #f5f8fa;
+$kweet-padding: 12px;
+$kweet-margin-bottom: 12px;
+$avatar-color: #757575;
+$card-border-color: #1da1f2;
+$card-padding: 16px;
+
+.kweet-list {
+  mat-card {
+    background-color: $kweet-background;
+    padding: $kweet-padding;
+    margin-bottom: $kweet-margin-bottom;
+    border: 5px solid $card-border-color;
+
+
+    mat-card-header {
+      align-items: center;
+    }
+
+    .avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: $avatar-color;
+
+      mat-icon {
+        font-size: 24px;
+        color: white;
+      }
+    }
+
+    .kweet-text {
+      text-align: left;
+    }
+
+    mat-card-actions {
+      padding-top: $kweet-padding;
+    }
+  }
+}

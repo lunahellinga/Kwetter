@@ -1,0 +1,18 @@
+﻿{
+  "profiles": {
+    "DataService": {
+      "commandName": "Project",
+      "dotnetRunMessages": "true",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "RABBITMQ_HOST": "rabbitmq",
+        "ROOT_CERT": "/cert/root.crt",
+        "DATABASE": "data-service",
+        "YUGABYTE_HOST": "europe-west4.b8706226-b7f7-402a-abec-b65b56570e4e.gcp.ybdb.io",
+        "YUGABYTE_USER": "admin",
+        "YUGABYTE_PASSWORD": "zdtTy9y1IRijtB9mwI-tl_ST50je9q"
+      }
+    }
+  }
+}

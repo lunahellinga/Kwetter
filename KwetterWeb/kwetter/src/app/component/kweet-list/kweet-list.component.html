@@ -1,0 +1,16 @@
+<mat-card *ngFor="let kweet of kweets" class="kweet-card">
+  <mat-card-header>
+    <img ngSrc="assets/avatar-svgrepo-com.svg" mat-card-avatar height="20" width="20" alt="User">
+    <mat-card-title>{{ kweet.userName }}</mat-card-title>
+    <mat-card-subtitle>{{ kweet.createdAt | date :'short'}}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <h3 class="kweet-text">{{ kweet.kweetText }}</h3>
+  </mat-card-content>
+
+  <mat-card-footer>
+    <p *ngIf="kweet.tags">Tags: {{ kweet.tags.join(', ') }}</p>
+    <p *ngIf="kweet.mentionedUsers">Mentioned Users: {{ kweet.mentionedUsers.join(', ') }}</p>
+  </mat-card-footer>
+</mat-card>

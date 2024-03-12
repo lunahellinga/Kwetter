@@ -1,0 +1,11 @@
+steps:
+  - task: SnykSecurityScan@1
+    inputs:
+      serviceConnectionEndpoint: 'Snyk'
+      testType: 'container'
+      dockerImageName: 'kweeter'
+      dockerfilePath: 'Kweeter/Dockerfile'
+      monitorWhen: 'always'
+      failOnIssues: true
+      projectName: 'Kweeter'
+      organization: 'd.hellinga'

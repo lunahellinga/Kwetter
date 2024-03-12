@@ -1,0 +1,49 @@
+﻿{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:22017",
+      "sslPort": 44397
+    }
+  },
+  "profiles": {
+    "http": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "http://localhost:5296",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "RABBITMQ_HOST": "rabbitmq",
+        "CACHE_URI": "http://cache-service/",
+        "Keycloak__realm": "Kwetter",
+        "Keycloak__auth-server-url": "https://keycloak.oibss.nl/",
+        "Keycloak__ssl-required": "none",
+        "Keycloak__resource": "test-client",
+        "Keycloak__verify-token-audience": "true",
+        "Keycloak__credentials__secret": "QRZ31kzH6NUeIIe9kZ3KHbFITRdwem17",
+        "Keycloak__confidential-port": "0",
+        "Keycloak__RolesSource": "Realm"
+      }
+    },
+    "https": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:7294;http://localhost:5296",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "RABBITMQ_HOST": "amqp://localhost:5672/",
+        "CACHE_URI": "http://localhost:5001/"
+      }
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

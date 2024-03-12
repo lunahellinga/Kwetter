@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  kwetter-api:
+    image: fontyssa/kwetter-api
+    build:
+      context: .
+      dockerfile: KwetterAPI/Dockerfile
+  
+  data-service:
+    image: fontyssa/kwetter-data-service
+    build:
+      context: .
+      dockerfile: DataService/Dockerfile
+  
+  content-service:
+    image: fontyssa/kwetter-content-service
+    build:
+      context: .
+      dockerfile: ContentService/Dockerfile
+
+  mention-service:
+    image: fontyssa/kwetter-mention-service
+    build:
+      context: .
+      dockerfile: MentionService/Dockerfile
+
+  tag-service:
+    image: fontyssa/kwetter-tag-service
+    build:
+      context: .
+      dockerfile: TagService/Dockerfile
+
+  metadata-service:
+    image: fontyssa/kwetter-metadata-service
+    build:
+      context: .
+      dockerfile: MetadataService/Dockerfile
+  
+  cache-service:
+    image: fontyssa/kwetter-cache-service
+    build:
+      context: .
+      dockerfile: CacheService/Dockerfile
+
+  orchestrator:
+    image: fontyssa/kweeter
+    build:
+      context: .
+      dockerfile: Kweeter/Dockerfile

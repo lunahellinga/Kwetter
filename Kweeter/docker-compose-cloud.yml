@@ -1,0 +1,176 @@
+version: "3.9"
+
+services:
+  kwetter-api:
+    image: fontyssa/kwetter-api
+    build:
+      context: .
+      dockerfile: KwetterAPI/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RABBITMQ_HOST=rabbitmq
+      - CACHE_URI=http://cache-service/
+      - Keycloak__realm=Kwetter
+      - Keycloak__auth-server-url=http://keycloak:8080/
+      - Keycloak__ssl-required=none
+      - Keycloak__resource=test-client
+      - Keycloak__verify-token-audience=true
+      - Keycloak__credentials__secret=temp
+      - Keycloak__confidential-port=0
+      - Keycloak__RolesSource=Realm
+    ports:
+      - "5000:80"
+  
+  kwetter-data-service:
+    image: fontyssa/kwetter-data-service
+    build:
+      context: .
+      dockerfile: DataService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RABBITMQ_HOST=rabbitmq
+      - ROOT_CERT=/cert/root.crt
+      - DATABASE=data-service
+      - YUGABYTE_HOST=temp
+      - YUGABYTE_USER=temp
+      - YUGABYTE_PASSWORD=temp
+  
+  content-service:
+    image: fontyssa/kwetter-content-service
+    build:
+      context: .
+      dockerfile: ContentService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RABBITMQ_HOST=rabbitmq
+      - ROOT_CERT=/cert/root.crt
+      - DATABASE=content-service
+      - YUGABYTE_HOST=temp
+      - YUGABYTE_USER=temp
+      - YUGABYTE_PASSWORD=temp
+  mention-service:
+    image: fontyssa/kwetter-mention-service
+    build:
+      context: .
+      dockerfile: MentionService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RABBITMQ_HOST=rabbitmq
+      - ROOT_CERT=/cert/root.crt
+      - DATABASE=mention-service
+      - YUGABYTE_HOST=temp
+      - YUGABYTE_USER=temp
+      - YUGABYTE_PASSWORD=temp
+  tag-service:
+    image: fontyssa/kwetter-tag-service
+    build:
+      context: .
+      dockerfile: TagService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RABBITMQ_HOST=rabbitmq
+      - ROOT_CERT=/cert/root.crt
+      - DATABASE=tag-service
+      - YUGABYTE_HOST=temp
+      - YUGABYTE_USER=temp
+      - YUGABYTE_PASSWORD=temp
+  metadata-service:
+    image: fontyssa/kwetter-metadata-service
+    build:
+      context: .
+      dockerfile: MetadataService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RABBITMQ_HOST=rabbitmq
+      - ROOT_CERT=/cert/root.crt
+      - DATABASE=metadata-service
+      - YUGABYTE_HOST=temp
+      - YUGABYTE_USER=temp
+      - YUGABYTE_PASSWORD=temp
+  
+  cache-service:
+    image: fontyssa/kwetter-cache-service
+    build:
+      context: .
+      dockerfile: CacheService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RABBITMQ_HOST=rabbitmq
+      - MONGO_CONNECTION=mongodb://caching-mongo:27017
+      - MONGO_DATABASE=cache
+      - MONGO_COLLECTION=kweets
+      - REDIS_CONFIG=caching-redis
+      - REDIS_INSTANCE=cache
+    ports:
+      - "5001:80"
+  caching-mongo:
+    image: mongo
+    environment:
+      # MONGO_INITDB_ROOT_USERNAME: root
+      # MONGO_INITDB_ROOT_PASSWORD: todo
+      - MONGO_INITDB_DATABASE=cache
+    expose:
+      - "27017"
+    ports:
+      - "3301:27017"
+    volumes:
+      - cache-volume:/data/db
+  caching-redis:
+    image: redis:7-alpine
+    expose:
+      - "6379"
+    ports:
+      - "6379:6379"
+  caching-mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8083:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=caching-mongo
+    depends_on:
+      - caching-mongo
+  caching-redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=caching-redis
+    ports:
+      - "8013:8081"
+    depends_on:
+      - caching-redis
+
+  kweeter:
+    image: fontyssa/kweeter
+    build:
+      context: .
+      dockerfile: Kweeter/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RABBITMQ_USERNAME=rabbit
+      - RABBITMQ_PASSWORD=rabbit
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_VIRTUAL_HOST=/
+      - MONGODB_CONNECTION=mongodb://kweeter-mongo:27017/
+      - MONGODB_DATABASE=kweeter
+      - MONGODB_COLLECTION=saga
+    depends_on:
+      - kweeter-mongo
+
+  kweeter-mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+  kweeter-mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8082:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: kweeter-mongo
+    depends_on:
+      - kweeter-mongo
+
+volumes:
+  cache-volume:
+    driver: local

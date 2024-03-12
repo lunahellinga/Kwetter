@@ -1,0 +1,19 @@
+﻿{
+  "profiles": {
+    "Kweeter": {
+      "commandName": "Project",
+      "dotnetRunMessages": "true",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "RABBITMQ_USERNAME": "rabbit",
+        "RABBITMQ_PASSWORD": "rabbit",
+        "RABBITMQ_HOST": "rabbitmq",
+        "RABBITMQ_PORT": "5672",
+        "RABBITMQ_VIRTUAL_HOST": "/",
+        "MONGODB_CONNECTION": "mongodb://orchestrator-mongo:27017/",
+        "MONGODB_DATABASE": "kweeter",
+        "MONGODB_COLLECTION": "saga"
+      }
+    }
+  }
+}

@@ -1,0 +1,108 @@
+﻿version: '3.9'
+services:
+  mongo-service:
+    build:
+      context: .
+      dockerfile: Mongo/Dockerfile
+    image: fontyssa/performance-mongo
+    ports:
+      - 5000:80
+    depends_on:
+      - mongo
+    networks:
+      - performance-test
+
+  neo4j-service:
+    build:
+      context: .
+      dockerfile: Neo4j/Dockerfile
+    image: fontyssa/performance-neo4j
+    ports:
+      - 5001:80
+    depends_on:
+      - neo4j
+    networks:
+      - performance-test
+
+  postgres-service:
+    build:
+      context: .
+      dockerfile: Postgres/Dockerfile
+    image: fontyssa/performance-postgres
+    ports:
+      - 5002:80
+    depends_on:
+      - postgres
+    networks:
+      - performance-test
+    environment:
+      - DB_TYPE=postgres
+      - CONNECTION_STRING=Server=postgres;Database=performance;Username=postgres;Password=postgres;
+    
+#  postgres-remote-service:
+#    build:
+#      context: .
+#      dockerfile: Postgres/Dockerfile
+#    image: fontyssa/performance-postgres
+#    ports:
+#      - 5004:80
+#    depends_on:
+#      - postgres
+#    networks:
+#      - performance-test
+#    environment:
+#      - DB_TYPE=postgres
+#      - CONNECTION_STRING=Server=34.32.209.71;Database=kwetter;Username=postgres;Password=LNlNm&uOP3\VU7gh;
+#    
+
+  yugabyte-service:
+    build:
+      context: .
+      dockerfile: Postgres/Dockerfile
+    image: fontyssa/performance-postgres
+    ports:
+      - 5003:80
+    networks:
+      - performance-test
+    environment:
+      - DB_TYPE=yugabyte
+      - ROOT_CERT=/cert/root.crt
+      - HOST=europe-west4.bbb2e79c-df5f-47b4-bb89-3becffce5910.gcp.ybdb.io
+      - DATABASE=kwetter
+      - USERNAME=admin
+      - PASSWORD=7H4ohQzAdPpNxhE_Cz68WYJnAKIAgo
+#      - HOST=
+#      - DATABASE=
+#      - USERNAME=
+#      - PASSWORD=
+  
+  mongo:
+    image: mongo
+    ports:
+      - 27017:27017
+    networks:
+      - performance-test
+
+  neo4j:
+    image: neo4j
+    ports:
+      - 7474:7474
+      - 7687:7687
+    environment:
+      - NEO4J_AUTH=neo4j/testpass123
+    networks:
+      - performance-test
+
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=performance
+    networks:
+      - performance-test
+
+networks:
+  performance-test:

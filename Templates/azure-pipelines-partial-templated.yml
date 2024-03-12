@@ -1,0 +1,58 @@
+---
+trigger:
+  branches:
+    include:
+      - '*'
+  paths:
+    include:
+      # Ex: CacheService
+      - TODO
+
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  # Differentiate between branches
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  isDev: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
+  # Repository path:
+  repoPath: Kweeter
+  # Configure SonarCloud
+  sonarCliProjectKey: FontysVerkeer_Rekeningrijden
+  sonarCliProjectName: Rekeningrijden
+
+resources:
+  repositories:
+    - repository: templates
+      endpoint: Groep2Rekeningrijden
+      type: github
+      name: Groep2Rekeningrijden/Templates
+
+stages:
+  - stage: test_isolated
+    jobs:
+      # --- Run unit tests on isolated instance ---
+      - job: unit_test
+        steps:
+          - template: setup/sparse-checkout.yml@templates
+          - template: setup/dotnet-7_0.yml@templates
+          - template: test/sonar_cloud_prepare.yml@templates
+          - template: test/python_pytest.yml@templates
+          - template: test/sonar_cloud_analyze.yml@templates
+
+  # --- Run tests on dev environment ---
+  - stage: test_dev
+    dependsOn: test_isolated
+    condition: and(succeeded(), or(eq(variables.isDev, 'true'), eq(variables.isMain, 'true')))
+    jobs:
+      - job: B1
+      - job: B2
+
+  # --- Deploy to prod ---
+  - stage: prod
+    dependsOn: test_dev
+    condition: and(succeeded(), eq(variables.isMain, 'true'))
+    jobs:
+      - job: C1
+      - job: C2
